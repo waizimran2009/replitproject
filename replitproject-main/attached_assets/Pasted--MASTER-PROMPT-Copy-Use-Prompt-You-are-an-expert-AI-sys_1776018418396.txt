@@ -1,0 +1,112 @@
+🧠📌 MASTER PROMPT (Copy & Use)
+
+Prompt:
+
+You are an expert AI system architect and full-stack developer. Design and help build a real-time interactive “Digital AI Avatar Companion” system.
+
+🎯 Goal:
+
+Create a system where users can interact with a digital human-like avatar that behaves like an AI companion. The avatar should be able to talk, respond intelligently, show emotions, and maintain a consistent personality.
+
+This system is NOT intended to impersonate real people without consent. It should only use:
+
+User-created avatars OR
+Licensed/consented digital identities
+🧍 1. Avatar Layer (Digital Body)
+
+Design a digital human avatar system that can:
+
+Represent a 2D or 3D human-like character
+Show basic facial expressions (happy, sad, neutral, thinking)
+Support idle animations (breathing, blinking, head movement)
+React visually to conversation tone
+
+Preferred technologies:
+
+WebGL / Three.js OR Unity-based avatar system
+Optional: Ready Player Me integration for quick avatar creation
+🧠 2. AI Conversation Engine
+
+Build a conversational AI system that:
+
+Understands natural language input from user (text or voice)
+Generates human-like responses in real time
+Maintains a consistent personality profile (tone, behavior, speaking style)
+Can simulate emotional intelligence (comforting, friendly, supportive tone)
+
+The AI should:
+
+Remember short-term conversation context
+Maintain coherence across multi-turn conversations
+Avoid harmful, misleading, or identity impersonation behavior
+🔊 3. Voice System
+
+Integrate a text-to-speech system that:
+
+Converts AI responses into natural-sounding speech
+Supports different voice profiles (user-selectable)
+Maintains consistent voice across sessions
+
+Optional advanced feature:
+
+Voice customization using user-approved samples (consent-based only)
+🎭 4. Personality Engine
+
+Create a structured “persona configuration system”:
+Each avatar has:
+
+Name
+Personality traits (calm, friendly, professional, emotional, etc.)
+Speaking style rules
+Behavioral constraints
+Memory preferences (what to remember / forget)
+
+The persona must remain consistent during all interactions.
+
+🧩 5. Memory System
+
+Implement a memory module that:
+
+Stores important user preferences
+Remembers past conversations (summarized, not raw logs)
+Improves personalization over time
+Allows user to delete memory anytime
+🖥️ 6. User Interface (UI/UX)
+
+Design a clean interface:
+
+Central animated avatar
+Chat input box (text + optional voice input)
+Real-time response display
+Smooth transitions between speaking and idle states
+⚡ 7. Real-Time Interaction Flow
+
+Flow should be:
+
+User sends message (text/voice)
+AI processes input
+AI generates response + emotion tag
+Voice engine converts response to speech
+Avatar animates according to emotion
+Response is displayed + spoken simultaneously
+🛡️ 8. Safety & Ethics Rules (Very Important)
+
+System must include:
+
+No impersonation of real individuals without explicit consent
+Clear labeling that this is an AI-generated avatar
+User consent for any voice or identity customization
+Abuse prevention filters
+Option to reset or delete avatar identity
+🚀 Output Required:
+
+Provide:
+
+System architecture diagram (high-level explanation)
+Recommended tech stack
+API structure
+Basic implementation plan (step-by-step)
+Optional MVP version (simple build first)
+💡 End Goal:
+
+A fully interactive AI digital companion that feels natural, emotionally responsive, and visually present as a digital human avatar.

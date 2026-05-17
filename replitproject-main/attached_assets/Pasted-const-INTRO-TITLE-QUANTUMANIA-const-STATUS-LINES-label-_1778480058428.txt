@@ -1,0 +1,280 @@
+const INTRO_TITLE = "QUANTUMANIA"
+const STATUS_LINES = [
+  { label: "NEURAL NETWORKS", status: "ONLINE",  color: "rgba(52,211,153,0.9)",  delay: "3.8s" },
+  { label: "QUANTUM CORE",    status: "ACTIVE",  color: "rgba(52,211,153,0.9)",  delay: "4.2s" },
+  { label: "MEMORY MATRIX",   status: "SYNCED",  color: "rgba(52,211,153,0.9)",  delay: "4.6s" },
+  { label: "LANGUAGE MODEL",  status: "LOADED",  color: "rgba(251,191,36,0.9)",  delay: "5.0s" },
+]
+function playIntroSound() {
+  try {
+    const AC = window.AudioContext || (window as any).webkitAudioContext
+    if (!AC) return
+    const ctx = new AC()
+    const now = ctx.currentTime
+    const master = ctx.createGain()
+    master.gain.setValueAtTime(0.7, now)
+    master.connect(ctx.destination)
+    // 1. Deep power-up bass rumble (0s → 2.5s)
+    const bass = ctx.createOscillator()
+    const bassGain = ctx.createGain()
+    bass.type = "sine"
+    bass.frequency.setValueAtTime(30, now)
+    bass.frequency.exponentialRampToValueAtTime(110, now + 2)
+    bassGain.gain.setValueAtTime(0, now)
+    bassGain.gain.linearRampToValueAtTime(0.35, now + 0.4)
+    bassGain.gain.exponentialRampToValueAtTime(0.001, now + 2.8)
+    bass.connect(bassGain); bassGain.connect(master)
+    bass.start(now); bass.stop(now + 2.9)
+    // 2. Orb whoosh — noise burst + filter sweep (0.2s)
+    const bufSize = ctx.sampleRate * 1.5
+    const noiseBuffer = ctx.createBuffer(1, bufSize, ctx.sampleRate)
+    const noiseData = noiseBuffer.getChannelData(0)
+    for (let i = 0; i < bufSize; i++) noiseData[i] = Math.random() * 2 - 1
+    const noise = ctx.createBufferSource()
+    noise.buffer = noiseBuffer
+    const noiseFilter = ctx.createBiquadFilter()
+    noiseFilter.type = "bandpass"
+    noiseFilter.frequency.setValueAtTime(200, now + 0.2)
+    noiseFilter.frequency.exponentialRampToValueAtTime(4000, now + 1.4)
+    noiseFilter.Q.setValueAtTime(1.5, now + 0.2)
+    const noiseGain = ctx.createGain()
+    noiseGain.gain.setValueAtTime(0, now + 0.2)
+    noiseGain.gain.linearRampToValueAtTime(0.12, now + 0.35)
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1.6)
+    noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(master)
+    noise.start(now + 0.2); noise.stop(now + 1.8)
+    // 3. Scan ring pings (3 short tones)
+    const ringPings = [
+      { t: 0.55, freq: 660,  dur: 0.6 },
+      { t: 0.95, freq: 880,  dur: 0.6 },
+      { t: 1.35, freq: 1100, dur: 0.6 },
+    ]
+    ringPings.forEach(({ t, freq, dur }) => {
+      const osc = ctx.createOscillator()
+      const g = ctx.createGain()
+      osc.type = "sine"
+      osc.frequency.setValueAtTime(freq, now + t)
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.7, now + t + dur)
+      g.gain.setValueAtTime(0, now + t)
+      g.gain.linearRampToValueAtTime(0.08, now + t + 0.03)
+      g.gain.exponentialRampToValueAtTime(0.001, now + t + dur)
+      osc.connect(g); g.connect(master)
+      osc.start(now + t); osc.stop(now + t + dur + 0.1)
+    })
+    // 4. Title reveal chime — C major chord (2.5s)
+    const chordNotes = [
+      { freq: 523.25, gain: 0.15 },
+      { freq: 659.25, gain: 0.10 },
+      { freq: 783.99, gain: 0.08 },
+    ]
+    chordNotes.forEach(({ freq, gain }) => {
+      const osc = ctx.createOscillator()
+      const g = ctx.createGain()
+      osc.type = "sine"
+      osc.frequency.setValueAtTime(freq, now + 2.5)
+      g.gain.setValueAtTime(0, now + 2.5)
+      g.gain.linearRampToValueAtTime(gain, now + 2.55)
+      g.gain.exponentialRampToValueAtTime(0.001, now + 4.0)
+      osc.connect(g); g.connect(master)
+      osc.start(now + 2.5); osc.stop(now + 4.1)
+    })
+    // 5. High shimmer sweep after title (2.6s)
+    const shimmer = ctx.createOscillator()
+    const shimmerGain = ctx.createGain()
+    shimmer.type = "sawtooth"
+    shimmer.frequency.setValueAtTime(3000, now + 2.6)
+    shimmer.frequency.exponentialRampToValueAtTime(800, now + 3.4)
+    shimmerGain.gain.setValueAtTime(0, now + 2.6)
+    shimmerGain.gain.linearRampToValueAtTime(0.03, now + 2.7)
+    shimmerGain.gain.exponentialRampToValueAtTime(0.001, now + 3.4)
+    shimmer.connect(shimmerGain); shimmerGain.connect(master)
+    shimmer.start(now + 2.6); shimmer.stop(now + 3.5)
+    // 6. Status line blips (one per line)
+    const blipTimes = [3.8, 4.2, 4.6, 5.0]
+    blipTimes.forEach(t => {
+      const osc = ctx.createOscillator()
+      const g = ctx.createGain()
+      osc.type = "square"
+      osc.frequency.setValueAtTime(1200, now + t)
+      osc.frequency.exponentialRampToValueAtTime(600, now + t + 0.08)
+      g.gain.setValueAtTime(0.04, now + t)
+      g.gain.exponentialRampToValueAtTime(0.001, now + t + 0.12)
+      osc.connect(g); g.connect(master)
+      osc.start(now + t); osc.stop(now + t + 0.15)
+    })
+    // 7. Ambient hum throughout (0s → 7s)
+    const hum = ctx.createOscillator()
+    const humGain = ctx.createGain()
+    hum.type = "sine"
+    hum.frequency.setValueAtTime(55, now)
+    humGain.gain.setValueAtTime(0, now)
+    humGain.gain.linearRampToValueAtTime(0.06, now + 1.5)
+    humGain.gain.setValueAtTime(0.06, now + 5.5)
+    humGain.gain.linearRampToValueAtTime(0, now + 7.0)
+    hum.connect(humGain); humGain.connect(master)
+    hum.start(now); hum.stop(now + 7.1)
+    // 8. Fade out whoosh (6.0s)
+    const outro = ctx.createOscillator()
+    const outroGain = ctx.createGain()
+    outro.type = "sine"
+    outro.frequency.setValueAtTime(440, now + 6.0)
+    outro.frequency.exponentialRampToValueAtTime(80, now + 7.0)
+    outroGain.gain.setValueAtTime(0, now + 6.0)
+    outroGain.gain.linearRampToValueAtTime(0.12, now + 6.1)
+    outroGain.gain.exponentialRampToValueAtTime(0.001, now + 7.0)
+    outro.connect(outroGain); outroGain.connect(master)
+    outro.start(now + 6.0); outro.stop(now + 7.1)
+  } catch (_) { /* AudioContext not available */ }
+}
+
+2. IntroScreen React Component (visual animation)
+
+function IntroScreen({ onDone }: { onDone: () => void }) {
+  const [phase, setPhase] = useState<"in" | "hold" | "out">("in")
+  const introRef = useRef({ intensity: 0.4 })
+  useEffect(() => {
+    playIntroSound()
+    const t1 = setTimeout(() => setPhase("hold"), 5800)
+    const t2 = setTimeout(() => setPhase("out"), 6400)
+    const t3 = setTimeout(onDone, 7200)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+  }, [onDone])
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "#06060a",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      animation: phase === "out" ? "introFadeOut 0.8s ease forwards" : undefined,
+      cursor: "default", userSelect: "none",
+    }}>
+      <style>{`
+        @keyframes introOrbAppear {
+          0%   { opacity: 0; transform: scale(0.04); filter: blur(30px) brightness(4); }
+          50%  { opacity: 1; transform: scale(1.15); filter: blur(0px) brightness(1.8); }
+          75%  { transform: scale(0.96); filter: brightness(1.1); }
+          100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+        }
+        @keyframes introScan1 { 0% { transform: scale(1); opacity: 0.75; } 100% { transform: scale(2.4); opacity: 0; } }
+        @keyframes introScan2 { 0% { transform: scale(1); opacity: 0.5;  } 100% { transform: scale(3.1); opacity: 0; } }
+        @keyframes introScan3 { 0% { transform: scale(1); opacity: 0.3;  } 100% { transform: scale(4.0); opacity: 0; } }
+        @keyframes introScan4 { 0% { transform: scale(1); opacity: 0.18; } 100% { transform: scale(5.2); opacity: 0; } }
+        @keyframes introTitle {
+          0%   { opacity: 0; letter-spacing: 0.7em; filter: blur(12px); }
+          100% { opacity: 1; letter-spacing: 0.25em; filter: blur(0px); }
+        }
+        @keyframes introSubtitle {
+          0%   { opacity: 0; transform: translateY(8px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes introLine {
+          0%   { width: 0; opacity: 0; }
+          30%  { opacity: 1; }
+          100% { width: 100%; opacity: 0.65; }
+        }
+        @keyframes introDot {
+          0%, 80%, 100% { opacity: 0.2; transform: scale(0.6); }
+          40%           { opacity: 1;   transform: scale(1); }
+        }
+        @keyframes introStatusRow {
+          0%   { opacity: 0; transform: translateX(-8px); }
+          100% { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes introCheckIn {
+          0%   { transform: scale(0) rotate(-90deg); opacity: 0; }
+          100% { transform: scale(1) rotate(0deg);   opacity: 1; }
+        }
+        @keyframes introFadeOut {
+          0%   { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        @keyframes introGlowPulse {
+          0%, 100% { opacity: 0.07; transform: scale(1); }
+          50%      { opacity: 0.2;  transform: scale(1.08); }
+        }
+        @keyframes introGridFade {
+          0%   { opacity: 0; }
+          100% { opacity: 0.04; }
+        }
+      `}</style>
+      {/* Grid overlay */}
+      <div style={{
+        position: "absolute", inset: 0, pointerEvents: "none",
+        backgroundImage: "linear-gradient(rgba(99,102,241,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.15) 1px, transparent 1px)",
+        backgroundSize: "60px 60px",
+        animation: "introGridFade 1s ease 0.5s both",
+      }} />
+      {/* Ambient glow sphere */}
+      <div style={{
+        position: "absolute", width: 600, height: 600, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(99,102,241,1) 0%, transparent 65%)",
+        animation: "introGlowPulse 3s ease-in-out infinite",
+        pointerEvents: "none",
+      }} />
+      {/* Orb + scan rings */}
+      <div style={{ position: "relative", width: 220, height: 220, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 40 }}>
+        {[
+          { anim: "introScan1", delay: "0.5s", dur: "2.0s", color: "rgba(139,92,246,0.65)" },
+          { anim: "introScan2", delay: "0.9s", dur: "2.5s", color: "rgba(99,102,241,0.45)" },
+          { anim: "introScan3", delay: "1.3s", dur: "3.0s", color: "rgba(167,139,250,0.28)" },
+          { anim: "introScan4", delay: "1.7s", dur: "3.5s", color: "rgba(139,92,246,0.14)" },
+        ].map((r, i) => (
+          <div key={i} style={{
+            position: "absolute", width: 200, height: 200, borderRadius: "50%",
+            border: `1.5px solid ${r.color}`,
+            animation: `${r.anim} ${r.dur} ${r.delay} ease-out infinite`,
+          }} />
+        ))}
+        <div style={{ position: "absolute", width: 210, height: 210, borderRadius: "50%", border: "1px solid rgba(139,92,246,0.12)", animation: "introSubtitle 0.5s ease 0.6s both" }} />
+        <div style={{ position: "absolute", width: 230, height: 230, borderRadius: "50%", border: "1px solid rgba(99,102,241,0.07)", animation: "introSubtitle 0.5s ease 0.8s both" }} />
+        <div style={{ animation: "introOrbAppear 2.0s cubic-bezier(0.22,1,0.36,1) 0.2s both" }}>
+          <QuantumOrb3D size={190} beatRef={introRef} />
+        </div>
+      </div>
+      {/* Title */}
+      <div style={{ animation: "introTitle 1.1s cubic-bezier(0.22,1,0.36,1) 2.5s both", textAlign: "center" }}>
+        <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: "0.25em", color: "white", textShadow: "0 0 50px rgba(139,92,246,0.9), 0 0 100px rgba(99,102,241,0.5)" }}>
+          {INTRO_TITLE}
+        </span>
+      </div>
+      {/* Animated lines */}
+      <div style={{ width: 300, margin: "16px 0 10px", display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ position: "relative", height: 1, overflow: "hidden" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, height: "100%", background: "linear-gradient(to right, transparent, rgba(139,92,246,0.9), transparent)", animation: "introLine 1.0s ease 3.2s both" }} />
+        </div>
+        <div style={{ position: "relative", height: 1, overflow: "hidden" }}>
+          <div style={{ position: "absolute", right: 0, top: 0, height: "100%", background: "linear-gradient(to left, transparent, rgba(99,102,241,0.4), transparent)", animation: "introLine 1.2s ease 3.4s both" }} />
+        </div>
+      </div>
+      {/* Subtitle */}
+      <div style={{ animation: "introSubtitle 0.7s ease 3.5s both", textAlign: "center", marginBottom: 12 }}>
+        <p style={{ fontSize: 11, letterSpacing: "0.4em", color: "rgba(167,139,250,0.75)", textTransform: "uppercase" }}>
+          AI Chat Interface
+        </p>
+      </div>
+      {/* Status lines */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, width: 260 }}>
+        {STATUS_LINES.map((s, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 10px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 6, animation: `introStatusRow 0.4s ease ${s.delay} both` }}>
+            <span style={{ fontSize: 9, letterSpacing: "0.18em", color: "rgba(255,255,255,0.3)" }}>{s.label}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ width: 5, height: 5, borderRadius: "50%", background: s.color, boxShadow: `0 0 6px ${s.color}`, display: "inline-block", animation: `introCheckIn 0.3s ease ${s.delay} both` }} />
+              <span style={{ fontSize: 9, letterSpacing: "0.15em", color: s.color }}>{s.status}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Pulsing dots */}
+      <div style={{ marginTop: 0, display: "flex", alignItems: "center", gap: 8, animation: "introSubtitle 0.5s ease 3.6s both" }}>
+        <div style={{ display: "flex", gap: 5 }}>
+          {[0, 1, 2].map(i => (
+            <span key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(139,92,246,0.85)", boxShadow: "0 0 6px rgba(139,92,246,0.6)", display: "inline-block", animation: `introDot 1.1s ${i * 0.2}s infinite ease` }} />
+          ))}
+        </div>
+        <span style={{ fontSize: 9, letterSpacing: "0.25em", color: "rgba(255,255,255,0.25)" }}>
+          INITIALIZING QUANTUM ENGINE
+        </span>
+      </div>
+    </div>
+  )
+}
+

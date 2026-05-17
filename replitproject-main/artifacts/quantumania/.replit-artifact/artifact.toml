@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "QuantuMania AI Chat"
+version = "1.0.0"
+id = "artifacts/quantumania"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19353
+
+[services.development]
+run = "pnpm --filter @workspace/quantumania run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/quantumania", "run", "build" ]
+publicDir = "artifacts/quantumania/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19353"
+BASE_PATH = "/"
